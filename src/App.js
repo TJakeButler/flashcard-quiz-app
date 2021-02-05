@@ -9,13 +9,16 @@ function App() {
     axios.get('https://opentdb.com/api.php?amount=10')
     .then(res => {
       setFlashcards(res.data.results.map((questionItem, index) => {
-        const answer = questionItem.correct_answer
-        const options = [...questionItem.incorrect_answers, answer]
+        const answer = decodeString(questionItem.correct_answer)
+        const options = [
+          ...questionItem.incorrect_answers.map(a => decodeString(a)), 
+          answer
+        ]
 
             // individual flash card element
           return  {
             id: `${index}-${Date.now()}`,
-            question: questionItem.question,
+            question: decodeString(questionItem.question),
             answer: answer,
             //          50% of the time we have a negative number and 50% positive number
             options: options.sort(() => Math.random() - .5)
@@ -27,12 +30,18 @@ function App() {
   }, [])
 
 
-
+function decodeString(str) {
+  const textArea = document.createElement('textarea')
+  textArea.innerHTML= str
+  return textArea.value
+}
 
 
 
   return (
+    <div className="container">
     <FlashcardList flashcards={flashcards}/>
+    </div>
   );
 }
 
